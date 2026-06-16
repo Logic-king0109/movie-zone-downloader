@@ -1,4 +1,4 @@
-is the code trace if the user joint ? user will not start to using the bot untill join it and allow admin to use it which is me   import os
+import os
 import re
 import asyncio
 import requests
