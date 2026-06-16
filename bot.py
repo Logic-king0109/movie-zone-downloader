@@ -615,23 +615,26 @@ async def handle_callback(update, context):
                 fs = os.path.getsize(fp)
                 if fs > 2000000000: cleanup_after_send(fp); await pm.edit_text('❌ >2GB!'); return
                 
-                await pm.edit_text(
+                                await pm.edit_text(
                     f'✅ Ready!\n\n'
                     f'🎬 {info.get("title","")}\n'
                     f'📊 {fs/1048576:.1f} MB\n\n'
-                    f'📥 Download Link:\n'
+                    f'📥 YOUR DOWNLOAD LINK IS READY:\n'
                     f'{direct}\n\n'
-                    f'⚠️ Link expires in ~8 hours\n\n'
+                    f'☝️ Tap the link above and your movie will start downloading immediately\n'
+                    f'📱 The movie saves directly to your device\n\n'
+                    f'⚠️ IMPORTANT:\n'
+                    f'• This link expires in ~8 hours\n'
+                    f'• If link stops working, search the movie again\n\n'
                     f'⚠️ DISCLAIMER:\n'
-                    f'We do NOT own, host, or store any files.\n'
+                    f'We do NOT own, host, or store any movies.\n'
                     f'All content is fetched from publicly available\n'
                     f'third-party sources over which we have no control.\n'
                     f'If you believe any content infringes your copyright,\n'
-                    f'please submit a takedown request to:\n'
-                    f'📧 dmca.meetdownload.com\n\n'
                     f'👑 @Sir_logicking',
                     disable_web_page_preview=True
                 )
+            
                 cleanup_after_send(fp)
             except Exception as e:
                 try: await pm.edit_text(f'❌ {str(e)[:100]}')
