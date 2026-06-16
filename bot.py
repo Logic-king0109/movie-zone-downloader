@@ -29,39 +29,19 @@ sessions = {}
 active_downloads = {}
 download_pool = ThreadPoolExecutor(max_workers=10)
 
-# ============================================
-# BOT PROFILE PHOTO
-# ============================================
-
 BOT_PHOTO_URL = "mylogo.png"
-
-# ============================================
-# FORCE JOIN
-# ============================================
 
 FORCE_JOIN_CHANNEL = '@LogicKingNetwork'
 FORCE_JOIN_URL = 'https://t.me/LogicKingNetwork'
-
-# ============================================
-# HEADERS
-# ============================================
 
 HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 }
 
-# ============================================
-# EMOJIS & PROGRESS
-# ============================================
-
 SEARCH_EMOJIS = ['🔍','📡','🌐','💻','🎯','✨','⚡','🎬']
 DOWNLOAD_EMOJIS = ['📥','💾','⚡','📦','🚀','🎯','💫','✨','🔥','📊']
 PROGRESS_BARS = ['▱▱▱▱▱▱▱▱▱▱','▰▱▱▱▱▱▱▱▱▱','▰▰▱▱▱▱▱▱▱▱','▰▰▰▱▱▱▱▱▱▱','▰▰▰▰▱▱▱▱▱▱','▰▰▰▰▰▱▱▱▱▱','▰▰▰▰▰▰▱▱▱▱','▰▰▰▰▰▰▰▱▱▱','▰▰▰▰▰▰▰▰▱▱','▰▰▰▰▰▰▰▰▰▱','▰▰▰▰▰▰▰▰▰▰']
-
-# ============================================
-# AUTO-CORRECTION DATABASE
-# ============================================
 
 COMMON_MOVIES = [
     'iron man', 'iron man 2', 'iron man 3', 'thor', 'thor the dark world', 'thor ragnarok', 'thor love and thunder',
@@ -73,8 +53,7 @@ COMMON_MOVIES = [
     'spider man homecoming', 'spider man far from home', 'spider man no way home',
     'black panther', 'black panther wakanda forever',
     'captain marvel', 'the marvels', 'black widow', 'shang chi', 'eternals',
-    'deadpool', 'deadpool 2', 'deadpool and wolverine',
-    'venom', 'venom let there be carnage', 'venom the last dance',
+    'deadpool', 'deadpool 2', 'deadpool and wolverine', 'venom', 'venom let there be carnage', 'venom the last dance',
     'x men', 'x men 2', 'x men the last stand', 'x men first class', 'x men days of future past', 'x men apocalypse', 'x men dark phoenix',
     'wolverine', 'the wolverine', 'logan',
     'superman', 'superman 2', 'superman returns', 'man of steel',
@@ -140,10 +119,6 @@ COMMON_MOVIES = [
     'atlas', 'war machine', 'mortal kombat',
 ]
 
-# ============================================
-# AUTO-CORRECTION FUNCTION 
-# ============================================
-
 def auto_correct(query):
     query_lower = query.lower().strip()
     query_lower = re.sub(r'[^\w\s]', '', query_lower)
@@ -166,10 +141,6 @@ def auto_correct(query):
         return matches[0]
     
     return query
-
-# ============================================
-# FORCE JOIN CHECK
-# ============================================
 
 async def check_subscription(user_id, context):
     try:
@@ -199,10 +170,6 @@ async def require_subscription(update, context):
     )
     return False
 
-# ============================================
-# HEALTH CHECK SERVER (24/7)
-# ============================================
-
 class HealthHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
@@ -214,10 +181,6 @@ class HealthHandler(BaseHTTPRequestHandler):
 def start_health_server():
     port = int(os.environ.get('PORT', 10000))
     HTTPServer(('0.0.0.0', port), HealthHandler).serve_forever()
-
-# ============================================
-# CLEANUP FUNCTIONS
-# ============================================
 
 def cleanup_old_files():
     try:
@@ -235,10 +198,6 @@ def cleanup_after_send(filepath):
         if os.path.exists(filepath):
             os.remove(filepath)
     except: pass
-
-# ============================================
-# DOWNLOADER
-# ============================================
 
 class RobustDownloader:
     
@@ -351,10 +310,6 @@ class RobustDownloader:
 
 downloader = RobustDownloader()
 
-# ============================================
-# THENKIRI SCRAPER
-# ============================================
-
 class ThenkiriScraper:
     SEARCH_URL = "https://thenkiri.com/?s={query}&post_type=post"
     
@@ -416,10 +371,6 @@ class ThenkiriScraper:
 
 scraper = ThenkiriScraper()
 
-# ============================================
-# START COMMAND - PLAIN TEXT
-# ============================================
-
 async def start(update, context):
     user_name = update.effective_user.first_name
     
@@ -457,20 +408,9 @@ async def start(update, context):
     )
     
     try:
-        await update.message.reply_photo(
-            photo=BOT_PHOTO_URL,
-            caption=caption,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
+        await update.message.reply_photo(photo=BOT_PHOTO_URL, caption=caption, reply_markup=InlineKeyboardMarkup(keyboard))
     except:
-        await update.message.reply_text(
-            caption,
-            reply_markup=InlineKeyboardMarkup(keyboard)
-        )
-
-# ============================================
-# SEARCH - PLAIN TEXT
-# ============================================
+        await update.message.reply_text(caption, reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def handle_message(update, context):
     if not await require_subscription(update, context):
@@ -513,10 +453,6 @@ async def handle_message(update, context):
         try: await msg.edit_text(f'❌ {str(e)[:100]}')
         except: pass
 
-# ============================================
-# SHOW MOVIE - PLAIN TEXT
-# ============================================
-
 async def show_movie(msg, uid):
     s = sessions.get(uid)
     if not s: return
@@ -539,11 +475,7 @@ async def show_movie(msg, uid):
         nav.append(InlineKeyboardButton("Last ⏭", callback_data='last'))
     if nav: kb.append(nav)
     
-    kb.append([
-        InlineKeyboardButton("⏹ Stop", callback_data='stop_search'),
-        InlineKeyboardButton("▶️ Continue", callback_data='continue_search')
-    ])
-    
+    kb.append([InlineKeyboardButton("⏹ Stop", callback_data='stop_search'), InlineKeyboardButton("▶️ Continue", callback_data='continue_search')])
     kb.append([InlineKeyboardButton(f"📄 {page+1} of {total}", callback_data='noop')])
     
     if info and info.get('downloadwella_url'):
@@ -571,10 +503,6 @@ async def show_movie(msg, uid):
     except:
         await msg.chat.send_message(caption, reply_markup=InlineKeyboardMarkup(kb))
 
-# ============================================
-# CALLBACK HANDLER - PLAIN TEXT
-# ============================================
-
 async def handle_callback(update, context):
     q = update.callback_query; await q.answer()
     uid = update.effective_user.id; cid = q.message.chat_id
@@ -583,33 +511,15 @@ async def handle_callback(update, context):
     if q.data == 'how_to_use':
         await q.message.delete()
         await context.bot.send_message(cid,
-            f"📖 HOW TO USE:\n\n"
-            f"1️⃣ Type any movie name\n2️⃣ Browse results with ⬅️➡️\n"
-            f"3️⃣ Click 📥 DOWNLOAD\n4️⃣ Watch progress in real-time\n"
-            f"5️⃣ Get your movie file!\n\n"
-            f"💡 PRO TIPS:\n▸ INCLUDE YEAR FOR BETTER RESULTS\n"
-            f"▸ You can search while downloading\n▸ Use ⏹ Stop to cancel\n\n"
-            f"👑 @Sir_logicking",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Back to Start", callback_data='back_start')
-            ]])
-        )
+            f"📖 HOW TO USE:\n\n1️⃣ Type any movie name\n2️⃣ Browse results with ⬅️➡️\n3️⃣ Click 📥 DOWNLOAD\n4️⃣ Watch progress in real-time\n5️⃣ Get your movie file!\n\n💡 PRO TIPS:\n▸ INCLUDE YEAR FOR BETTER RESULTS\n▸ You can search while downloading\n▸ Use ⏹ Stop to cancel\n\n👑 @Sir_logicking",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Start", callback_data='back_start')]]))
         return
     
     if q.data == 'search_tips':
         await q.message.delete()
         await context.bot.send_message(cid,
-            f"🔍 SEARCH TIPS:\n\n"
-            f"✅ DO:\n▸ Include year: 'avatar 2009'\n"
-            f"▸ Use full name: 'jurassic world rebirth'\n"
-            f"▸ Try hyphens: 'spider-man-2002'\n\n"
-            f"❌ DON'T:\n▸ Don't use special characters\n"
-            f"▸ Don't type random letters\n\n"
-            f"💡 Bot auto-corrects typos!\n\n👑 @Sir_logicking",
-            reply_markup=InlineKeyboardMarkup([[
-                InlineKeyboardButton("🔙 Back to Start", callback_data='back_start')
-            ]])
-        )
+            f"🔍 SEARCH TIPS:\n\n✅ DO:\n▸ Include year: 'avatar 2009'\n▸ Use full name: 'jurassic world rebirth'\n▸ Try hyphens: 'spider-man-2002'\n\n❌ DON'T:\n▸ Don't use special characters\n▸ Don't type random letters\n\n💡 Bot auto-corrects typos!\n\n👑 @Sir_logicking",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Start", callback_data='back_start')]]))
         return
     
     if q.data == 'back_start':
@@ -623,12 +533,10 @@ async def handle_callback(update, context):
         ]
         try:
             await context.bot.send_photo(cid, photo=BOT_PHOTO_URL,
-                caption=f"🎬 MOVIE ZONE DOWNLOADER\n\n👋 Welcome, {user_name}!\n\n💡 Type a movie name to start!\n\n👑 @Sir_logicking",
-                reply_markup=InlineKeyboardMarkup(keyboard))
+                caption=f"🎬 MOVIE ZONE DOWNLOADER\n\n👋 Welcome, {user_name}!\n\n💡 Type a movie name to start!\n\n👑 @Sir_logicking", reply_markup=InlineKeyboardMarkup(keyboard))
         except:
             await context.bot.send_message(cid,
-                f"🎬 MOVIE ZONE DOWNLOADER\n\n👋 Welcome, {user_name}!\n\n💡 Type a movie name to start!\n\n👑 @Sir_logicking",
-                reply_markup=InlineKeyboardMarkup(keyboard))
+                f"🎬 MOVIE ZONE DOWNLOADER\n\n👋 Welcome, {user_name}!\n\n💡 Type a movie name to start!\n\n👑 @Sir_logicking", reply_markup=InlineKeyboardMarkup(keyboard))
         return
     
     if q.data == 'check_join':
@@ -690,7 +598,6 @@ async def handle_callback(update, context):
                 anim = asyncio.create_task(update_progress())
                 direct = await loop.run_in_executor(download_pool, downloader.selenium_get_link, dw)
                 if not direct: direct = await loop.run_in_executor(download_pool, downloader.requests_get_link, dw)
-                
                 if not direct: anim.cancel(); await pm.edit_text('❌ Failed!\n👑 @Sir_logicking'); return
                 
                 def dl_progress(pct, down, total):
@@ -708,17 +615,23 @@ async def handle_callback(update, context):
                 fs = os.path.getsize(fp)
                 if fs > 2000000000: cleanup_after_send(fp); await pm.edit_text('❌ >2GB!'); return
                 
-                await pm.edit_text(f'📤 Uploading... {fs/1048576:.1f}MB')
-                await context.bot.send_document(cid, open(fp,'rb'), 
-                    caption=f"🎬 {info.get('title','')}\n\n"
-                            f"⚠️ DISCLAIMER:\n"
-                            f"We do NOT own, host, or store any files.\n"
-                            f"All content is fetched from publicly available third-party sources.\n\n"
-                            f"If you believe any content infringes your copyright,\n"
-                            f"please submit a takedown request to:\n"
-                            f"📧 dmca.meetdownload.com\n\n"
-                            f"👑 @Sir_logicking")
-                await pm.edit_text(f'✅ Done! {fs/1048576:.1f}MB\n👑 @Sir_logicking')
+                await pm.edit_text(
+                    f'✅ Ready!\n\n'
+                    f'🎬 {info.get("title","")}\n'
+                    f'📊 {fs/1048576:.1f} MB\n\n'
+                    f'📥 Download Link:\n'
+                    f'{direct}\n\n'
+                    f'⚠️ Link expires in ~8 hours\n\n'
+                    f'⚠️ DISCLAIMER:\n'
+                    f'We do NOT own, host, or store any files.\n'
+                    f'All content is fetched from publicly available\n'
+                    f'third-party sources over which we have no control.\n'
+                    f'If you believe any content infringes your copyright,\n'
+                    f'please submit a takedown request to:\n'
+                    f'📧 dmca.meetdownload.com\n\n'
+                    f'👑 @Sir_logicking',
+                    disable_web_page_preview=True
+                )
                 cleanup_after_send(fp)
             except Exception as e:
                 try: await pm.edit_text(f'❌ {str(e)[:100]}')
@@ -728,10 +641,6 @@ async def handle_callback(update, context):
         
         asyncio.create_task(process())
         await q.answer('📥 Download started!')
-
-# ============================================
-# START BOT
-# ============================================
 
 def main():
     cleanup_old_files()
