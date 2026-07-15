@@ -632,7 +632,7 @@ async def handle_callback(update, context):
                 fs = os.path.getsize(fp)
                 if fs > 2000000000: cleanup_after_send(fp); await pm.edit_text('❌ >2GB!'); return
                 
-                                await pm.edit_text(
+                await pm.edit_text(
                     f'✅ Ready!\n\n'
                     f'🎬 {info.get("title","")}\n'
                     f'📊 {fs/1048576:.1f} MB\n\n'
