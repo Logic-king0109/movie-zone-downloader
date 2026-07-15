@@ -452,7 +452,6 @@ async def handle_message(update, context):
         anim.cancel()
         try: await msg.edit_text(f'❌ {str(e)[:100]}')
         except: pass
-
 async def show_movie(msg, uid):
     s = sessions.get(uid)
     if not s: return
@@ -466,37 +465,55 @@ async def show_movie(msg, uid):
     
     kb = []
     
-    nav = []
-    if page > 0:
-        nav.append(InlineKeyboardButton("⏮ First", callback_data='first'))
-        nav.append(InlineKeyboardButton("⬅️ Prev", callback_data='prev'))
-    if page < total-1:
-        nav.append(InlineKeyboardButton("Next ➡️", callback_data='next'))
-        nav.append(InlineKeyboardButton("Last ⏭", callback_data='last'))
-    if nav: kb.append(nav)
+    # ✅ Determine if this movie is valid (has a download link)
+    has_movie = info and info.get('downloadwella_url')
     
-    kb.append([InlineKeyboardButton("⏹ Stop", callback_data='stop_search'), InlineKeyboardButton("▶️ Continue", callback_data='continue_search')])
+    # 🔒 Only build navigation buttons if movie is valid
+    nav = []
+    if has_movie:
+        if page > 0:
+            nav.append(InlineKeyboardButton("⏮ First", callback_data='first'))
+            nav.append(InlineKeyboardButton("⬅️ Prev", callback_data='prev'))
+        if page < total-1:
+            nav.append(InlineKeyboardButton("Next ➡️", callback_data='next'))
+            nav.append(InlineKeyboardButton("Last ⏭", callback_data='last'))
+    if nav:
+        kb.append(nav)
+    
+    kb.append([InlineKeyboardButton("⏹ Stop", callback_data='stop_search'), 
+               InlineKeyboardButton("▶️ Continue", callback_data='continue_search')])
     kb.append([InlineKeyboardButton(f"📄 {page+1} of {total}", callback_data='noop')])
     
-    if info and info.get('downloadwella_url'):
+    # ✅ Only show download button if movie exists
+    if has_movie:
         kb.append([InlineKeyboardButton("📥 DOWNLOAD", callback_data=f"dl_{page}")])
     
     title = info['title'] if info else movie['title']
     poster = info['poster'] if info else movie.get('poster')
     
+    # ✅ Show appropriate message
+    if has_movie:
+        status_text = '✅ Download Available'
+    else:
+        status_text = '❌ Movie not found — try another search'
+    
     caption = (
         f"🎬 {title}\n\n"
         f"📊 Result {page+1} of {total}\n"
-        f"{'✅ Download Available' if info and info.get('downloadwella_url') else '❌ I am sorry, I fail to fetch the movie'}\n"
-        f"⏹ Stop | ▶️ Continue | ⬅️➡️ Navigate\n\n"
-        f"👑 @Sir_logicking"
+        f"{status_text}\n"
+        f"⏹ Stop | ▶️ Continue\n"
     )
+    
+    if has_movie:
+        caption += "\n👑 @Sir_logicking"
+    else:
+        caption += "\n\n💡 Tip: Try searching with a different name or year\n👑 @Sir_logicking"
     
     try: await msg.delete()
     except: pass
     
     try:
-        if poster:
+        if poster and has_movie:
             await msg.chat.send_photo(photo=poster, caption=caption, reply_markup=InlineKeyboardMarkup(kb))
         else:
             await msg.chat.send_message(caption, reply_markup=InlineKeyboardMarkup(kb))
